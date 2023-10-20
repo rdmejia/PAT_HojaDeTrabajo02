@@ -129,10 +129,10 @@ namespace HT02Tests {
 		for (QueueOperation* op : *operations) {
 			GTEST_COUT << " - Instruccion [" << i << "]: " << op->funcName << "(" << (op->type == VOID_FUNC ? std::to_string(op->param) : "") << ")" << std::endl;
 
-			int r = queueOps.at(op->funcName)(queue, op->param);
+			int poppedValue = queueOps.at(op->funcName)(queue, op->param);
 
 			if (op->type == INT_FUNC) {
-				EXPECT_EQ(r, op->expected) << "Error al llamar la instruccion [" << i <<"] -> " << op->funcName << "().\nSe esperaba [" << op->expected << "], pero se encontro [" << r << "]";
+				ASSERT_EQ(poppedValue, op->expected) << "Error al llamar la instruccion [" << i <<"] -> " << op->funcName << "().\nSe esperaba [" << op->expected << "], pero se encontro [" << poppedValue << "]";
 			}
 
 			++i;
