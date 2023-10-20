@@ -117,6 +117,9 @@ namespace HT02Tests {
 				ops->push_back(new QueueOperation{op, p, r, type});
 			}
 
+			if (ops->size() > 0)
+				params.push_back(ops);
+
 			return params;
 		}
 	};
@@ -124,11 +127,12 @@ namespace HT02Tests {
 	TEST_P(E04Tests, E04HandlingQueue) {
 		int i = 0;
 		for (QueueOperation* op : *operations) {
+			GTEST_COUT << " - Instruccion [" << i << "]: " << op->funcName << "(" << (op->type == VOID_FUNC ? std::to_string(op->param) : "") << ")" << std::endl;
+
 			int r = queueOps.at(op->funcName)(queue, op->param);
 
 			if (op->type == INT_FUNC) {
-				EXPECT_EQ(r, op->expected) << "Error al llamar la instruccion [" << i <<"] -> " << op->funcName << "(" << op->param 
-					<< ").\nSe esperaba [" << op->expected << "], pero se encontro [" << r << "]";
+				EXPECT_EQ(r, op->expected) << "Error al llamar la instruccion [" << i <<"] -> " << op->funcName << "().\nSe esperaba [" << op->expected << "], pero se encontro [" << r << "]";
 			}
 
 			++i;
