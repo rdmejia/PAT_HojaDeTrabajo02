@@ -3,7 +3,6 @@
 
 using std::stack;
 using std::isdigit;
-using std::iswspace;
 
 int Ejercicio03::calculate(string s)
 {
@@ -15,7 +14,7 @@ int Ejercicio03::calculate(string s)
         if(isdigit(s[i])) {
             currentNumber = 10 * currentNumber + (s[i] - '0');
         }
-        if(!isdigit(s[i]) && !iswspace(s[i]) || i == s.size() - 1) {
+        if(!isdigit(s[i]) && s[i] != ' ' || i == s.size() - 1) {
             if(sign == '+') {
                 stack.push(currentNumber);
             }
