@@ -6,26 +6,24 @@ Node<char>* Ejercicio01::rotateRight(Node<char>* head, int k)
         return head;
 
     Node<char>* it = head;
-    Node<char>* prev = nullptr;
 
     int size = 0;
-    while (it) {
+    while (it->next) {
         ++size;
-        prev = it;
         it = it->next;
     }
+    ++size;
 
     k = k % size;
-    prev->next = head;
-
-    prev = nullptr;
-    while (k >= 0) {
-        prev = head;
+    it->next = head;
+    
+    while (size != k) {
+        it = head;
         head = head->next;
-        --k;
+        --size;
     }
 
-    prev->next = nullptr;
+    it->next = nullptr;
 
     return head;
 }
