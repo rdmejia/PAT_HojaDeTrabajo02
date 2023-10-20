@@ -63,7 +63,7 @@ jobs:
 
     - name: Tests E01
       run: |
-       vstest.console.exe /TestAdapterPath:GoogleTestAdapter.0.18.0\build\_common /TestCaseFilter:"FullyQualifiedName~E01" .\${{env.BUILD_CONFIGURATION}}\${{env.OUTPUT_EXE}} > ${{env.E01_LOG_FILE}}
+       vstest.console.exe /Parallel /TestAdapterPath:GoogleTestAdapter.0.18.0\build\_common /TestCaseFilter:"FullyQualifiedName~E01" .\${{env.BUILD_CONFIGURATION}}\${{env.OUTPUT_EXE}} > ${{env.E01_LOG_FILE}}
        cat ${{env.E01_LOG_FILE}}
     
     - name: Tests E02

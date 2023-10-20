@@ -15,9 +15,9 @@ popMiddle,,-1
 pushFront,4,
 pushFront,3,
 pushFront,2,
-popFront,,4
-popFront,,3
 popFront,,2
+popFront,,3
+popFront,,4
 popFront,,-1
 
 popBack,,-1

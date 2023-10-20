@@ -96,7 +96,7 @@ namespace HT02Tests {
 
 		int i = 0;
 		while (head && expectedHead) {
-			EXPECT_EQ(expectedHead->value, head->value) << "Error en la posicion [" << i << "] de la lista"
+			ASSERT_EQ(expectedHead->value, head->value) << "Error en la posicion [" << i << "] de la lista"
 				<< ". Se esperaba [" << expectedHead->value << "], pero se encontro [" << head->value
 				<< "]\nLista esperada: [" << expected << "]\nLista obtenida: [" << actual << "]";
 			
