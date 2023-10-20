@@ -1,0 +1,140 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Compilacion y Pruebas
+
+on:
+  push:
+    branches: [ "main", "solution" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+
+  OUTPUT_EXE: TestsHojaDeTrabajo02.exe
+
+  E01_MAX_GRADE: 25
+  E01_LOG_FILE: E01results.log
+
+  E02_MAX_GRADE: 25
+  E02_LOG_FILE: E02results.log
+
+  E03_MAX_GRADE: 25
+  E03_LOG_FILE: E03results.log
+
+  E04_MAX_GRADE: 25
+  E04_LOG_FILE: E04results.log
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Install Google Test Adapter
+      run: nuget install GoogleTestAdapter -Version 0.18.0
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x86 ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Setup VSTest Path
+      uses: darenm/Setup-VSTest@v1.2
+
+    - name: Tests E01
+      run: |
+       vstest.console.exe /TestAdapterPath:GoogleTestAdapter.0.18.0\build\_common /TestCaseFilter:"FullyQualifiedName~E01" .\${{env.BUILD_CONFIGURATION}}\${{env.OUTPUT_EXE}} > ${{env.E01_LOG_FILE}}
+       cat ${{env.E01_LOG_FILE}}
+    
+    - name: Tests E02
+      if: success() || failure()
+      run: |
+       vstest.console.exe /TestAdapterPath:GoogleTestAdapter.0.18.0\build\_common /TestCaseFilter:"FullyQualifiedName~E02" .\${{env.BUILD_CONFIGURATION}}\${{env.OUTPUT_EXE}} > ${{env.E02_LOG_FILE}}
+       cat ${{env.E02_LOG_FILE}}
+
+    - name: Tests E03
+      if: success() || failure()
+      run: |
+       vstest.console.exe /TestAdapterPath:GoogleTestAdapter.0.18.0\build\_common /TestCaseFilter:"FullyQualifiedName~E03" .\${{env.BUILD_CONFIGURATION}}\${{env.OUTPUT_EXE}} > ${{env.E03_LOG_FILE}}
+       cat ${{env.E03_LOG_FILE}}
+    
+    - name: Tests E04
+      if: success() || failure()
+      run: |
+       vstest.console.exe /TestAdapterPath:GoogleTestAdapter.0.18.0\build\_common /TestCaseFilter:"FullyQualifiedName~E04" .\${{env.BUILD_CONFIGURATION}}\${{env.OUTPUT_EXE}} > ${{env.E04_LOG_FILE}}
+       cat ${{env.E04_LOG_FILE}} 
+
+    - name: Results
+      if: success() || failure()
+      run: |
+        $E01_TOTAL_TESTS = (Select-String -Path .\${{env.E01_LOG_FILE}}  -Pattern "Total\s+tests:\s+[0-9]+").Matches.Value
+        $E01_TOTAL_TESTS = [double]($E01_TOTAL_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E01_PASSED_TESTS = (Select-String -Path .\${{env.E01_LOG_FILE}}  -Pattern "Passed:\s+[0-9]+").Matches.Value
+        $E01_PASSED_TESTS = [double]($E01_PASSED_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E01_FAILED_TESTS = $E01_TOTAL_TESTS - $E01_PASSED_TESTS
+        $E01_GRADE = ($E01_PASSED_TESTS / $E01_TOTAL_TESTS) * ${{env.E01_MAX_GRADE}}
+        echo "======================E01======================"
+        echo "Passed Tests: $E01_PASSED_TESTS | Failed Tests: $E01_FAILED_TESTS | Total: $E01_TOTAL_TESTS"
+        echo "Nota: $E01_GRADE / ${{env.E01_MAX_GRADE}}"
+        echo "==============================================="
+
+        $E02_TOTAL_TESTS = (Select-String -Path .\${{env.E02_LOG_FILE}}  -Pattern "Total\s+tests:\s+[0-9]+").Matches.Value
+        $E02_TOTAL_TESTS = [double]($E02_TOTAL_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E02_PASSED_TESTS = (Select-String -Path .\${{env.E02_LOG_FILE}}  -Pattern "Passed:\s+[0-9]+").Matches.Value
+        $E02_PASSED_TESTS = [double]($E02_PASSED_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E02_FAILED_TESTS = $E02_TOTAL_TESTS - $E02_PASSED_TESTS
+        $E02_GRADE = ($E02_PASSED_TESTS / $E02_TOTAL_TESTS) * ${{env.E02_MAX_GRADE}}
+        echo "======================E02======================"
+        echo "Passed Tests: $E02_PASSED_TESTS | Failed Tests: $E02_FAILED_TESTS | Total: $E02_TOTAL_TESTS"
+        echo "Nota: $E02_GRADE / ${{env.E02_MAX_GRADE}}"
+        echo "==============================================="
+
+        $E03_TOTAL_TESTS = (Select-String -Path .\${{env.E03_LOG_FILE}}  -Pattern "Total\s+tests:\s+[0-9]+").Matches.Value
+        $E03_TOTAL_TESTS = [double]($E03_TOTAL_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E03_PASSED_TESTS = (Select-String -Path .\${{env.E03_LOG_FILE}}  -Pattern "Passed:\s+[0-9]+").Matches.Value
+        $E03_PASSED_TESTS = [double]($E03_PASSED_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E03_FAILED_TESTS = $E03_TOTAL_TESTS - $E03_PASSED_TESTS
+        $E03_GRADE = ($E03_PASSED_TESTS / $E03_TOTAL_TESTS) * ${{env.E03_MAX_GRADE}}
+        echo "======================E03======================"
+        echo "Passed Tests: $E03_PASSED_TESTS | Failed Tests: $E03_FAILED_TESTS | Total: $E03_TOTAL_TESTS"
+        echo "Nota: $E03_GRADE / ${{env.E03_MAX_GRADE}}"
+        echo "==============================================="
+
+        $E04_TOTAL_TESTS = (Select-String -Path .\${{env.E04_LOG_FILE}}  -Pattern "Total\s+tests:\s+[0-9]+").Matches.Value
+        $E04_TOTAL_TESTS = [double]($E04_TOTAL_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E04_PASSED_TESTS = (Select-String -Path .\${{env.E04_LOG_FILE}}  -Pattern "Passed:\s+[0-9]+").Matches.Value
+        $E04_PASSED_TESTS = [double]($E04_PASSED_TESTS | Select-String -Pattern "[0-9]+").Matches.Value
+        $E04_FAILED_TESTS = $E04_TOTAL_TESTS - $E04_PASSED_TESTS
+        $E04_GRADE = ($E04_PASSED_TESTS / $E04_TOTAL_TESTS) * ${{env.E04_MAX_GRADE}}
+        echo "======================E04======================"
+        echo "Passed Tests: $E04_PASSED_TESTS | Failed Tests: $E04_FAILED_TESTS | Total: $E04_TOTAL_TESTS"
+        echo "Nota: $E04_GRADE / ${{env.E04_MAX_GRADE}}"
+        echo "==============================================="
+
+        $TOTAL_GRADE = $E01_GRADE + $E02_GRADE + $E03_GRADE + $E04_GRADE
+        $TOTAL_MAX_GRADE =  ${{env.E01_MAX_GRADE}} + ${{env.E02_MAX_GRADE}} + ${{env.E03_MAX_GRADE}} + ${{env.E04_MAX_GRADE}}
+        echo "==============================================="
+        echo "TOTAL: $TOTAL_GRADE / $TOTAL_MAX_GRADE"
+        echo "==============================================="
+
+        if ( $TOTAL_GRADE -ne $TOTAL_MAX_GRADE) { exit 1 }
