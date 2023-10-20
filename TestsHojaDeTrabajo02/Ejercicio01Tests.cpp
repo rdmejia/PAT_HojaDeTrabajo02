@@ -75,6 +75,7 @@ namespace HT02Tests {
 
 	string buildFromList(Node<char>* head) {
 		string r = "";
+		r.reserve(500);
 
 		while (head) {
 			r += head->value;
