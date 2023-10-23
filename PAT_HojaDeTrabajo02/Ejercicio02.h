@@ -6,9 +6,9 @@ class Ejercicio02
 {
 public:
 	Node<int>* addTwoNumbers(Node<int>* l1, Node<int>* l2){
-		    Node<int> dummy(0);
-    Node<int>* current = &dummy;
-    int carry = 0;
+	Node<int> dummy(0);
+    	Node<int>* current = &dummy;
+    	int carry = 0;
 
     while (l1 || l2 || carry) {
         int sum = carry;
